@@ -1,0 +1,17 @@
+{
+    "name": "ryan/resume_db",
+    "authors": [
+        {
+            "name": "Ryan Cobelli",
+            "email": "ryan.cobelli@rybel-llc.com"
+        }
+    ],
+    "require": {
+        "ext-json": "*",
+        "ext-mysqli": "*",
+        "ext-curl": "*",
+        "ext-simplexml": "*",
+      "ext-openssl": "*",
+        "erusev/parsedown": "^1.7"
+    }
+}
