@@ -29,38 +29,65 @@ $data = $helper->select($_REQUEST['id']);
 // Start rendering the content
 ob_start();
 ?>
-<h1>
-    <?php echo $data['internal_resume_name']; ?>
-</h1>
-Copy & Paste the data from this page into a nicely formatted Word document resume template
-<hr />
+<div class="d-print-none">
+    <h1>
+        <?php echo $data['internal_resume_name']; ?>
+    </h1>
+    Hit <a onclick="print(); return false;" href="#">Print</a> or copy paste your information into a custom resume
+    template
+    <hr />
+</div>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif&display=swap" rel="stylesheet">
 <style>
+    body {
+        font-family: 'PT Serif', serif !important;
+    }
+
+    a:link {
+        text-decoration: underline;
+    }
+
     h2 {
         margin-top: 20px;
     }
 </style>
 
 <?php
+echo "<h1 class='text-center'>" . $profileHelper->name() . "</h1>";
+echo "<h4 class='text-center'>" . $profileHelper->email() . " | " . $profileHelper->phone() . "</h4>";
+
 $links = $linksHelper->getLinks($resume_id);
 if (count($links) > 0) {
     echo "<h2>Links</h2>";
 }
-echo "<ul>";
+echo "<h5>";
 foreach ($links as $i) {
-    $linkData = $linksHelper->select($i['job_id']);
-    echo '<li>' . $linkData['link_value'] . '</li>';
+    $linkData = $linksHelper->select($i['link_id']);
+    echo $linkData['link_value'] . ' | ';
 }
-echo "</ul>";
+echo "</h5>";
 
+echo "<hr/>";
 
 $linkedJobs = $jobsHelper->getLinks($resume_id);
 if (count($linkedJobs) > 0) {
     echo "<h2>Work Experience</h2>";
 }
+$jobs = array();
 foreach ($linkedJobs as $i) {
-    $jobData = $jobsHelper->select($i['job_id']);
+    array_push($jobs, $jobsHelper->select($i['job_id']));
+}
+
+function cmp($a, $b)
+{
+    return -1 * strcmp($a["start_date"], $b["start_date"]);
+}
+
+usort($jobs, "cmp");
+
+foreach ($jobs as $jobData) {
     echo $jobData['title'] . ', ' . $jobData['employer_name'];
-    
+
     if (!is_null($jobData['location'])) {
         echo ' | ' . $jobData['location'];
     }
@@ -82,6 +109,7 @@ foreach ($linkedJobs as $i) {
     }
 }
 
+echo "<hr/>";
 
 $linkedEducation = $educationHelper->getLinks($resume_id);
 if (count($linkedEducation) > 0) {
@@ -100,6 +128,7 @@ foreach ($linkedEducation as $i) {
     echo $parsedown->text($educationData['description']);
 }
 
+echo "<hr/>";
 
 $linkedCerts = $certificateHelper->getLinks($resume_id);
 if (count($linkedCerts) > 0) {
@@ -113,7 +142,7 @@ foreach ($linkedCerts as $i) {
 
 if (!is_null($data['skills'])) {
     echo "<h2>Skills</h2>";
-    echo $data['skills'];
+    echo $parsedown->text($data['skills']);
 }
 
 
