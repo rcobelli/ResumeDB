@@ -30,6 +30,7 @@ ob_start();
         <thead>
         <tr>
             <th>Internal Resume Names</th>
+            <th>Primary Target</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -38,6 +39,7 @@ ob_start();
         foreach ($resumeDao->selectAll() as $i) {
             echo "<tr>";
             echo "<td><a onClick=\"MyWindow=window.open('editResume.php?action=update&id=" . $i['resume_id'] . "','MyWindow','width=600,height=900'); return false;\" href='#'>" . $i['internal_resume_name'] . "</a></td>";
+            echo "<td><a onClick=\"MyWindow=window.open('editResume.php?action=update&id=" . $i['resume_id'] . "','MyWindow','width=600,height=900'); return false;\" href='#'>" . $i['machine_first'] ? "Machine" : "Human" . "</a></td>";
             echo "<td><a class='btn btn-outline-danger' href='?action=delete&id=" . $i['job_id'] . "'>🗑️</a>&nbsp;<a class='btn btn-outline-info' href='#' onClick=\"MyWindow=window.open('printResume.php?id=" . $i['resume_id'] . "','MyWindow','width=600,height=900'); return false;\">🖨️</a></td>";
             echo "</tr>";
         }
