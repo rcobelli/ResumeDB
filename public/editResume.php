@@ -51,8 +51,8 @@ if (!empty($_POST)) {
     if (isset($_POST['link'])) {
         $linksHelper->deleteLinks($resume_id);
         foreach ($_POST['link'] as $i) {
-            if (!$certificateHelper->createLink($resume_id, $i)) {
-                $errors[] = $certificateHelper->getErrorMessage();
+            if (!$linksHelper->createLink($resume_id, $i)) {
+                $errors[] = $linksHelper->getErrorMessage();
                 break;
             }
         }
