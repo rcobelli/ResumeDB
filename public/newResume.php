@@ -2,12 +2,27 @@
 
 include '../init.php';
 
+$samlHelper->processSamlInput();
+
+if (!$samlHelper->isLoggedIn()) {
+    header("Location: index.php");
+    die();
+}
+
+$config['type'] = Rybel\backbone\LogStream::console;
+
 $certificateHelper = new CertificationDao($config);
 $educationHelper = new EducationDao($config);
 $jobsHelper = new JobsDao($config);
 $linksHelper = new LinksDao($config);
 $profileHelper = new ProfileHelper($config);
 $helper = new ResumeDao($config);
+
+// Boilerplate
+$page = new Rybel\backbone\page();
+$page->addHeader("../includes/header.php");
+$page->addFooter("../includes/footer.php");
+$page->addHeader("../includes/navbar.php");
 
 if (!empty($_POST)) {
     if (!$helper->insert($_POST)) {
@@ -18,7 +33,7 @@ if (!empty($_POST)) {
     if (isset($_POST['education'])) {
         foreach ($_POST['education'] as $i) {
             if (!$educationHelper->createLink($resume_id, $i)) {
-                $errors[] = $educationHelper->getErrorMessage();
+                $page->addError($helper->getErrorMessage());
                 break;
             }
         }
@@ -26,7 +41,7 @@ if (!empty($_POST)) {
     if (isset($_POST['job'])) {
         foreach ($_POST['job'] as $i) {
             if (!$jobsHelper->createLink($resume_id, $i)) {
-                $errors[] = $jobsHelper->getErrorMessage();
+                $page->addError($helper->getErrorMessage());
                 break;
             }
         }
@@ -34,7 +49,7 @@ if (!empty($_POST)) {
     if (isset($_POST['certification'])) {
         foreach ($_POST['certification'] as $i) {
             if (!$certificateHelper->createLink($resume_id, $i)) {
-                $errors[] = $certificateHelper->getErrorMessage();
+                $page->addError($helper->getErrorMessage());
                 break;
             }
         }
@@ -42,7 +57,7 @@ if (!empty($_POST)) {
     if (isset($_POST['link'])) {
         foreach ($_POST['link'] as $i) {
             if (!$certificateHelper->createLink($resume_id, $i)) {
-                $errors[] = $certificateHelper->getErrorMessage();
+                $page->addError($helper->getErrorMessage());
                 break;
             }
         }
@@ -52,14 +67,6 @@ if (!empty($_POST)) {
         echo "<script>window.close();</script>";
     }
 }
-
-// Site/page boilerplate
-$site = new site($errors);
-init_site($site);
-
-$page = new page();
-$site->setPage($page);
-
 
 // Start rendering the content
 ob_start();
@@ -142,6 +149,4 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$page->setContent($content);
-
-$site->render();
+$page->render($content);

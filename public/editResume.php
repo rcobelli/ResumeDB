@@ -2,6 +2,15 @@
 
 include '../init.php';
 
+$samlHelper->processSamlInput();
+
+if (!$samlHelper->isLoggedIn()) {
+    header("Location: index.php");
+    die();
+}
+
+$config['type'] = Rybel\backbone\LogStream::console;
+
 $certificateHelper = new CertificationDao($config);
 $educationHelper = new EducationDao($config);
 $jobsHelper = new JobsDao($config);
@@ -16,6 +25,12 @@ if (is_null($resume_id)) {
     die();
 }
 
+// Boilerplate
+$page = new Rybel\backbone\page();
+$page->addHeader("../includes/header.php");
+$page->addFooter("../includes/footer.php");
+$page->addHeader("../includes/navbar.php");
+
 if (!empty($_POST)) {
     if (!$helper->update($resume_id, $_POST)) {
         $errors[] = $helper->getErrorMessage();
@@ -25,7 +40,7 @@ if (!empty($_POST)) {
         $educationHelper->deleteLinks($resume_id);
         foreach ($_POST['education'] as $i) {
             if (!$educationHelper->createLink($resume_id, $i)) {
-                $errors[] = $educationHelper->getErrorMessage();
+                $page->addError($helper->getErrorMessage());
                 break;
             }
         }
@@ -34,7 +49,7 @@ if (!empty($_POST)) {
         $jobsHelper->deleteLinks($resume_id);
         foreach ($_POST['job'] as $i) {
             if (!$jobsHelper->createLink($resume_id, $i)) {
-                $errors[] = $jobsHelper->getErrorMessage();
+                $page->addError($helper->getErrorMessage());
                 break;
             }
         }
@@ -43,7 +58,7 @@ if (!empty($_POST)) {
         $certificateHelper->deleteLinks($resume_id);
         foreach ($_POST['certification'] as $i) {
             if (!$certificateHelper->createLink($resume_id, $i)) {
-                $errors[] = $certificateHelper->getErrorMessage();
+                $page->addError($helper->getErrorMessage());
                 break;
             }
         }
@@ -52,7 +67,7 @@ if (!empty($_POST)) {
         $linksHelper->deleteLinks($resume_id);
         foreach ($_POST['link'] as $i) {
             if (!$linksHelper->createLink($resume_id, $i)) {
-                $errors[] = $linksHelper->getErrorMessage();
+                $page->addError($helper->getErrorMessage());
                 break;
             }
         }
@@ -62,13 +77,6 @@ if (!empty($_POST)) {
         echo "<script>window.close();</script>";
     }
 }
-
-// Site/page boilerplate
-$site = new site($errors);
-init_site($site);
-
-$page = new page();
-$site->setPage($page);
 
 $data = $helper->select($_REQUEST['id']);
 
@@ -181,6 +189,4 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$page->setContent($content);
-
-$site->render();
+$page->render($content);

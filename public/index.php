@@ -1,24 +1,32 @@
 <?php
+
 include '../init.php';
 
+$samlHelper->processSamlInput();
+
+if (!$samlHelper->isLoggedIn()) {
+    header("Location: ?sso");
+    die();
+}
+
+$config['type'] = Rybel\backbone\LogStream::console;
+
 $resumeDao = new ResumeDao($config);
+
+// Boilerplate
+$page = new Rybel\backbone\page();
+$page->addHeader("../includes/header.php");
+$page->addFooter("../includes/footer.php");
+$page->addHeader("../includes/navbar.php");
 
 if ($_REQUEST['action'] == 'delete') {
     if ($helper->delete($_REQUEST['id'])) {
         header("Location: ?");
         die();
     } else {
-        $errors[] = $helper->getErrorMessage();
+        $page->addError($helper->getErrorMessage());
     }
 }
-
-// Site/page boilerplate
-$site = new site($errors);
-$site->addHeader("../includes/navbar.php");
-init_site($site);
-
-$page = new page();
-$site->setPage($page);
 
 // Start rendering the content
 ob_start();
@@ -56,6 +64,4 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
-$page->setContent($content);
-
-$site->render();
+$page->render($content);

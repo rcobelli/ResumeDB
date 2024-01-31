@@ -11,7 +11,14 @@
         "ext-mysqli": "*",
         "ext-curl": "*",
         "ext-simplexml": "*",
-      "ext-openssl": "*",
-        "erusev/parsedown": "^1.7"
-    }
+        "ext-openssl": "*",
+        "erusev/parsedown": "^1.7",
+        "rybel-llc/backbone": "1.*"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "https://github.com/Rybel-LLC/Backbone"
+        }
+    ]
 }

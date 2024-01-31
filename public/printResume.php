@@ -2,6 +2,14 @@
 
 include '../init.php';
 
+$samlHelper->processSamlInput();
+
+if (!$samlHelper->isLoggedIn()) {
+    header("Location: index.php");
+    die();
+}
+
+$config['type'] = Rybel\backbone\LogStream::console;
 $certificateHelper = new CertificationDao($config);
 $educationHelper = new EducationDao($config);
 $jobsHelper = new JobsDao($config);
@@ -17,12 +25,11 @@ if (is_null($resume_id)) {
     die();
 }
 
-// Site/page boilerplate
-$site = new site($errors);
-init_site($site);
-
-$page = new page();
-$site->setPage($page);
+// Boilerplate
+$page = new Rybel\backbone\page();
+$page->addHeader("../includes/header.php");
+$page->addFooter("../includes/footer.php");
+$page->addHeader("../includes/navbar.php");
 
 $data = $helper->select($_REQUEST['id']);
 
@@ -145,9 +152,5 @@ if (!is_null($data['skills'])) {
     echo $parsedown->text($data['skills']);
 }
 
-
-
 $content = ob_get_clean();
-$page->setContent($content);
-
-$site->render();
+$page->render($content);
